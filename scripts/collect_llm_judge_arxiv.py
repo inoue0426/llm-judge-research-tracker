@@ -8,12 +8,11 @@ import datetime as dt
 import json
 import pathlib
 import re
-from typing import Dict
-from typing import Iterable, List, Optional, Sequence
+from typing import Dict, Iterable, List, Optional, Sequence
 
 import arxiv
-from diskcache import Cache
 import requests
+from diskcache import Cache
 
 QUERY_TERMS: Sequence[str] = (
     "LLM as a judge",
@@ -47,7 +46,14 @@ TAG_MIN_SCORE = 1
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 
 SECTION_KEYWORDS = {
-    "purpose": ("we propose", "we present", "this paper", "we introduce", "goal", "aim"),
+    "purpose": (
+        "we propose",
+        "we present",
+        "this paper",
+        "we introduce",
+        "goal",
+        "aim",
+    ),
     "method": (
         "we use",
         "we develop",
@@ -192,8 +198,8 @@ def build_arxiv_query(terms: Sequence[str]) -> str:
     fragments: List[str] = []
     for term in terms:
         quoted = f'"{term}"'
-        fragments.append(f'ti:{quoted}')
-        fragments.append(f'abs:{quoted}')
+        fragments.append(f"ti:{quoted}")
+        fragments.append(f"abs:{quoted}")
     return " OR ".join(fragments)
 
 
@@ -209,7 +215,11 @@ def split_sentences(text: str) -> List[str]:
     cleaned = " ".join(text.strip().split())
     if not cleaned:
         return []
-    return [sentence.strip() for sentence in SENTENCE_SPLIT_RE.split(cleaned) if sentence.strip()]
+    return [
+        sentence.strip()
+        for sentence in SENTENCE_SPLIT_RE.split(cleaned)
+        if sentence.strip()
+    ]
 
 
 def score_sentence(sentence: str, keywords: Iterable[str]) -> int:
@@ -239,7 +249,10 @@ def pick_sentence(sentences: Sequence[str], keywords: Iterable[str]) -> str:
     if not sentences:
         return "Not stated."
     scored = sorted(
-        ((score_sentence(sentence, keywords), index, sentence) for index, sentence in enumerate(sentences)),
+        (
+            (score_sentence(sentence, keywords), index, sentence)
+            for index, sentence in enumerate(sentences)
+        ),
         key=lambda item: (-item[0], item[1]),
     )
     if scored[0][0] == 0:
@@ -352,9 +365,15 @@ def parse_llm_summary(text: str) -> Optional[tuple[str, str, str]]:
     lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
     if len(lines) < 3:
         return None
-    purpose_line = next((line for line in lines if line.lower().startswith("purpose:")), None)
-    method_line = next((line for line in lines if line.lower().startswith("method:")), None)
-    results_line = next((line for line in lines if line.lower().startswith("results:")), None)
+    purpose_line = next(
+        (line for line in lines if line.lower().startswith("purpose:")), None
+    )
+    method_line = next(
+        (line for line in lines if line.lower().startswith("method:")), None
+    )
+    results_line = next(
+        (line for line in lines if line.lower().startswith("results:")), None
+    )
     if not (purpose_line and method_line and results_line):
         return None
     return (
@@ -500,7 +519,9 @@ def summarize_results(
                     "Ollama summarization failed while --require-llm is enabled "
                     f"for paper {result.get_short_id()}."
                 )
-            purpose, method, results_sentence = summarize_abstract_sections(result.summary)
+            purpose, method, results_sentence = summarize_abstract_sections(
+                result.summary
+            )
         tag_keys, tags = classify_tags(
             title=result.title,
             abstract=result.summary,
@@ -527,7 +548,9 @@ def summarize_results(
     return summaries
 
 
-def render_markdown(summaries: Sequence[PaperSummary], query: str, days_back: int) -> str:
+def render_markdown(
+    summaries: Sequence[PaperSummary], query: str, days_back: int
+) -> str:
     """Render collected summaries to Markdown.
 
     Args:
@@ -857,7 +880,9 @@ def render_tag_pie_chart(tag_counts: Dict[str, int]) -> str:
     ]
     if not tag_counts:
         tag_counts = {"Unclassified": 0}
-    for label, count in sorted(tag_counts.items(), key=lambda item: (-item[1], item[0])):
+    for label, count in sorted(
+        tag_counts.items(), key=lambda item: (-item[1], item[0])
+    ):
         lines.append(f'    "{label}" : {count}')
     lines.append("```")
     return "\n".join(lines)
@@ -881,9 +906,7 @@ def update_readme_tag_chart(readme_path: str, tag_counts: Dict[str, int]) -> Non
     chart = render_tag_pie_chart(tag_counts)
     replacement = f"{TAG_STATS_START}\n{chart}\n{TAG_STATS_END}"
     updated = (
-        content[:start_index]
-        + replacement
-        + content[end_index + len(TAG_STATS_END) :]
+        content[:start_index] + replacement + content[end_index + len(TAG_STATS_END) :]
     )
     path.write_text(updated, encoding="utf-8")
 
@@ -908,7 +931,9 @@ def parse_args() -> argparse.Namespace:
     Returns:
         Parsed arguments.
     """
-    parser = argparse.ArgumentParser(description="Collect LLM-as-a-judge papers from arXiv.")
+    parser = argparse.ArgumentParser(
+        description="Collect LLM-as-a-judge papers from arXiv."
+    )
     parser.add_argument("--days-back", type=int, default=DEFAULT_DAYS_BACK)
     parser.add_argument("--max-results", type=int, default=DEFAULT_MAX_RESULTS)
     parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT_PATH)

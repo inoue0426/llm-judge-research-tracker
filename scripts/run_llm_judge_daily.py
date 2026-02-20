@@ -49,7 +49,9 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_BACKFILL_DAYS,
         help="Generate daily reports for the last N days.",
     )
-    parser.add_argument("--force", action="store_true", help="Run even if already ran today.")
+    parser.add_argument(
+        "--force", action="store_true", help="Run even if already ran today."
+    )
     return parser.parse_args()
 
 
