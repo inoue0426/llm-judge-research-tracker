@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.local.llm_judge_arxiv</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>uv</string>
+    <string>run</string>
+    <string>--no-sync</string>
+    <string>python</string>
+    <string>scripts/run_llm_judge_daily.py</string>
+    <string>--days-back</string>
+    <string>1</string>
+    <string>--run-after-hour</string>
+    <string>8</string>
+    <string>--skip-failed</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/inouey2/code/llm-judge-research-tracker</string>
+
+  <key>StartInterval</key>
+  <integer>3600</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/inouey2/code/llm-judge-research-tracker/reports/llm-as-a-judge_cron.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/inouey2/code/llm-judge-research-tracker/reports/llm-as-a-judge_cron.log</string>
+</dict>
+</plist>

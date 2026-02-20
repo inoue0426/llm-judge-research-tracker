@@ -130,6 +130,16 @@ ENV/
 env.bak/
 venv.bak/
 
+# UV
+.uv/
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -139,6 +149,9 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# Project caches/logs
+reports/llm-as-a-judge_cron.log
 
 # mypy
 .mypy_cache/

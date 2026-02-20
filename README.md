@@ -1,5 +1,81 @@
 # Base-Python
 
+## LLM-as-a-Judge arXiv Monitor
+
+This repo includes a scheduled collector that searches arXiv for "LLM as a Judge" papers and writes a Markdown report for GitHub reading.
+
+Run manually:
+
+```bash
+uv run python scripts/collect_llm_judge_arxiv.py --days-back 90
+```
+
+Output:
+- `reports/llm-as-a-judge.md`
+
+Automation:
+- GitHub Actions workflow runs daily and updates the report if there are changes.
+- The workflow uses `--no-llm` because Ollama is local-only; to use Ollama locally, set `--ollama-model llama3.3`.
+
+## Subclass Counts (Latest Window)
+
+<!-- TAG_STATS_START -->
+```mermaid
+pie title LLM-as-a-Judge Subclass Counts
+    "Unclassified" : 0
+```
+<!-- TAG_STATS_END -->
+
+## LLM-as-a-Judge Design Overview
+
+This tracker uses LLMs only for summarization, while paper discovery remains deterministic via arXiv queries.
+
+```mermaid
+flowchart TD
+  A[arXiv Query Builder] --> B[arXiv Search API]
+  B --> C[Paper Metadata + Abstract]
+  C --> D{Ollama Available?}
+  D -->|Yes| E[LLM Summary\nPurpose/Method/Results]
+  D -->|No| F[Heuristic Summary\nfrom Abstract]
+  E --> G[Subclass Tagger\nkeyword rules]
+  F --> G
+  G --> H[Daily Report\nreports/daily/YYYY-MM-DD.md]
+  G --> I[Latest Report\nreports/llm-as-a-judge.md]
+  G --> J[Tags CSV/JSON]
+  H --> K[Daily Index\nreports/daily/index.md]
+```
+
+## Reports Overview
+
+- `reports/llm-as-a-judge.md`: The main arXiv monitor report (Purpose/Method/Results per paper).
+- `reports/llm-as-a-judge_subclasses.md`: Example subclass scheme to group papers while reading the report.
+- `reports/llm-as-a-judge_tags.csv`: Structured tags per paper (auto-generated).
+- `reports/llm-as-a-judge_tags.json`: Structured tags per paper (auto-generated).
+- `reports/daily/`: Daily snapshots with `reports/daily/index.md`.
+
+Backfill example (create daily reports for the last 7 days):
+
+```bash
+uv run --no-sync --python .venv/bin/python scripts/collect_llm_judge_arxiv.py --backfill-days 7 --require-llm --skip-failed
+```
+
+## Local Daily Run (macOS)
+
+Use launchd to run daily at 08:00 local time, and also retry hourly if missed (e.g., laptop asleep or offline).
+
+1. Update `scripts/com.local.llm_judge_arxiv.plist` by replacing `/ABS/PATH/TO/REPO` with your repo path.
+2. Load the job:
+
+```bash
+launchctl bootstrap gui/$(id -u) scripts/com.local.llm_judge_arxiv.plist
+```
+
+To unload:
+
+```bash
+launchctl bootout gui/$(id -u) scripts/com.local.llm_judge_arxiv.plist
+```
+
 ## Project Setup
 
 This project uses [uv](https://github.com/astral-sh/uv) for Python package management. Follow these steps to set up your development environment:
