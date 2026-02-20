@@ -34,6 +34,9 @@ DEFAULT_BACKFILL_SKIP_EXISTING = True
 DEFAULT_README_PATH = "README.md"
 TAG_STATS_START = "<!-- TAG_STATS_START -->"
 TAG_STATS_END = "<!-- TAG_STATS_END -->"
+TAG_TREND_START = "<!-- TAG_TREND_START -->"
+TAG_TREND_END = "<!-- TAG_TREND_END -->"
+TAG_TREND_TOP_N = 5
 CACHE_DIR = ".cache/llm_judge_arxiv"
 OLLAMA_ENDPOINT = "http://localhost:11434"
 OLLAMA_MODEL = "llama3.3"
@@ -911,6 +914,139 @@ def update_readme_tag_chart(readme_path: str, tag_counts: Dict[str, int]) -> Non
     path.write_text(updated, encoding="utf-8")
 
 
+def read_daily_tag_counts(daily_dir: str) -> Dict[dt.date, Dict[str, int]]:
+    """Read daily tag counts from daily reports.
+
+    Args:
+        daily_dir: Directory containing daily reports.
+
+    Returns:
+        Mapping of date to tag-count mapping.
+    """
+    path = pathlib.Path(daily_dir)
+    series: Dict[dt.date, Dict[str, int]] = {}
+    if not path.exists():
+        return series
+    for entry in path.glob("*.md"):
+        if entry.name == "index.md":
+            continue
+        try:
+            report_date = dt.date.fromisoformat(entry.stem)
+        except ValueError:
+            continue
+        counts: Dict[str, int] = {}
+        for line in entry.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line.startswith("Tags:"):
+                continue
+            tags_raw = line.split(":", 1)[1].strip()
+            if not tags_raw:
+                continue
+            for tag in (tag.strip() for tag in tags_raw.split(",")):
+                if not tag:
+                    continue
+                counts[tag] = counts.get(tag, 0) + 1
+        if counts:
+            series[report_date] = counts
+    return series
+
+
+def build_cumulative_series(
+    daily_counts: Dict[dt.date, Dict[str, int]]
+) -> tuple[List[dt.date], Dict[str, List[int]]]:
+    """Build cumulative series from daily counts.
+
+    Args:
+        daily_counts: Date to tag counts.
+
+    Returns:
+        Tuple of ordered dates and tag-to-cumulative list.
+    """
+    dates = sorted(daily_counts.keys())
+    totals: Dict[str, int] = {}
+    series: Dict[str, List[int]] = {}
+    for day in dates:
+        for tag, count in daily_counts[day].items():
+            totals[tag] = totals.get(tag, 0) + count
+        for tag, total in totals.items():
+            series.setdefault(tag, []).append(total)
+        for tag in list(series.keys()):
+            if tag not in totals:
+                series[tag].append(series[tag][-1])
+    return dates, series
+
+
+def render_tag_trend_chart(dates: List[dt.date], series: Dict[str, List[int]]) -> str:
+    """Render a Mermaid xychart for cumulative tag counts.
+
+    Args:
+        dates: Ordered dates.
+        series: Tag to cumulative values.
+
+    Returns:
+        Mermaid chart block.
+    """
+    lines = [
+        "```mermaid",
+        'xychart-beta',
+        '    title "Subclass Cumulative Counts (Daily)"',
+    ]
+    if not dates or not series:
+        lines.extend(
+            [
+                "    x-axis []",
+                '    y-axis "Papers" 0 --> 1',
+                "```",
+            ]
+        )
+        return "\n".join(lines)
+    labels = [date.isoformat() for date in dates]
+    lines.append(f"    x-axis [{', '.join(f'\"{label}\"' for label in labels)}]")
+    final_counts = {tag: values[-1] for tag, values in series.items()}
+    sorted_tags = sorted(final_counts.items(), key=lambda item: (-item[1], item[0]))
+    top_tags = [tag for tag, _ in sorted_tags[:TAG_TREND_TOP_N]]
+    other_tags = [tag for tag, _ in sorted_tags[TAG_TREND_TOP_N:]]
+    max_value = max(final_counts.values()) if final_counts else 1
+    lines.append(f'    y-axis "Papers" 0 --> {max_value}')
+    for tag in top_tags:
+        values = series.get(tag, [])
+        lines.append(f'    series "{tag}" [{", ".join(str(v) for v in values)}]')
+    if other_tags:
+        other_values: List[int] = []
+        for idx in range(len(dates)):
+            other_values.append(sum(series[tag][idx] for tag in other_tags))
+        lines.append(f'    series "Other" [{", ".join(str(v) for v in other_values)}]')
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def update_readme_tag_trend(readme_path: str, daily_dir: str) -> None:
+    """Update README with tag trend chart.
+
+    Args:
+        readme_path: README path.
+        daily_dir: Directory containing daily reports.
+    """
+    path = pathlib.Path(readme_path)
+    if not path.exists():
+        return
+    content = path.read_text(encoding="utf-8")
+    start_index = content.find(TAG_TREND_START)
+    end_index = content.find(TAG_TREND_END)
+    if start_index == -1 or end_index == -1 or end_index <= start_index:
+        return
+    daily_counts = read_daily_tag_counts(daily_dir)
+    dates, series = build_cumulative_series(daily_counts)
+    chart = render_tag_trend_chart(dates, series)
+    replacement = f"{TAG_TREND_START}\n{chart}\n{TAG_TREND_END}"
+    updated = (
+        content[:start_index]
+        + replacement
+        + content[end_index + len(TAG_TREND_END) :]
+    )
+    path.write_text(updated, encoding="utf-8")
+
+
 def write_text(path: str, content: str) -> None:
     """Write text to disk, creating directories if needed.
 
@@ -1004,6 +1140,7 @@ def main() -> None:
     write_text(args.tags_json, render_tags_json(summaries))
     write_text(args.tags_csv, render_tags_csv(summaries))
     update_readme_tag_chart(args.readme_path, build_tag_counts(summaries_all))
+    update_readme_tag_trend(args.readme_path, args.daily_dir)
     if args.backfill_days > 0:
         for offset in range(args.backfill_days):
             day = report_date - dt.timedelta(days=offset)

@@ -1,6 +1,4 @@
-# Base-Python
-
-## LLM-as-a-Judge arXiv Monitor
+# LLM-as-a-Judge arXiv Monitor
 
 This repo includes a scheduled collector that searches arXiv for "LLM as a Judge" papers and writes a Markdown report for GitHub reading.
 
@@ -14,17 +12,37 @@ Output:
 - `reports/llm-as-a-judge.md`
 
 Automation:
-- GitHub Actions workflow runs daily and updates the report if there are changes.
-- The workflow uses `--no-llm` because Ollama is local-only; to use Ollama locally, set `--ollama-model llama3.3`.
+- GitHub Actions workflow formats Python on push.
 
 ## Subclass Counts (Latest Window)
 
 <!-- TAG_STATS_START -->
 ```mermaid
 pie title LLM-as-a-Judge Subclass Counts
-    "Unclassified" : 0
+    "Judge Reliability And Calibration" : 17
+    "Benchmark And Dataset Creation" : 16
+    "Judge Prompting Protocols" : 8
+    "Metrics And Scoring Methods" : 8
+    "Domain-Specific Judging" : 3
+    "Robustness And Sensitivity" : 2
 ```
 <!-- TAG_STATS_END -->
+
+## Subclass Cumulative Trend
+
+<!-- TAG_TREND_START -->
+```mermaid
+xychart-beta
+    title "Subclass Cumulative Counts (Daily)"
+    x-axis ["2026-02-19", "2026-02-20"]
+    y-axis "Papers" 0 --> 6
+    series "Judge Reliability And Calibration" [3, 6]
+    series "Metrics And Scoring Methods" [2, 4]
+    series "Robustness And Sensitivity" [2, 4]
+    series "Benchmark And Dataset Creation" [1, 2]
+    series "Judge Prompting Protocols" [1, 2]
+```
+<!-- TAG_TREND_END -->
 
 ## LLM-as-a-Judge Design Overview
 

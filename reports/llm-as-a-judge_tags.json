@@ -1,1 +1,96 @@
-[]
+[
+  {
+    "arxiv_id": "2602.17433v1",
+    "title": "Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models",
+    "published": "2026-02-19",
+    "updated": "2026-02-19",
+    "categories": "cs.CY",
+    "link": "http://arxiv.org/abs/2602.17433v1",
+    "tag_keys": [
+      "benchmarks_and_datasets",
+      "robustness_and_sensitivity"
+    ],
+    "tags": [
+      "Benchmark And Dataset Creation",
+      "Robustness And Sensitivity"
+    ]
+  },
+  {
+    "arxiv_id": "2602.17316v1",
+    "title": "Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation",
+    "published": "2026-02-19",
+    "updated": "2026-02-19",
+    "categories": "cs.CL, cs.AI",
+    "link": "http://arxiv.org/abs/2602.17316v1",
+    "tag_keys": [
+      "robustness_and_sensitivity",
+      "metrics_and_scoring"
+    ],
+    "tags": [
+      "Robustness And Sensitivity",
+      "Metrics And Scoring Methods"
+    ]
+  },
+  {
+    "arxiv_id": "2602.17264v1",
+    "title": "On the Reliability of User-Centric Evaluation of Conversational Recommender Systems",
+    "published": "2026-02-19",
+    "updated": "2026-02-19",
+    "categories": "cs.IR",
+    "link": "http://arxiv.org/abs/2602.17264v1",
+    "tag_keys": [
+      "judge_reliability_and_calibration"
+    ],
+    "tags": [
+      "Judge Reliability And Calibration"
+    ]
+  },
+  {
+    "arxiv_id": "2602.17262v1",
+    "title": "Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study",
+    "published": "2026-02-19",
+    "updated": "2026-02-19",
+    "categories": "cs.CL, stat.ME",
+    "link": "http://arxiv.org/abs/2602.17262v1",
+    "tag_keys": [
+      "judge_reliability_and_calibration",
+      "metrics_and_scoring"
+    ],
+    "tags": [
+      "Judge Reliability And Calibration",
+      "Metrics And Scoring Methods"
+    ]
+  },
+  {
+    "arxiv_id": "2602.17170v1",
+    "title": "When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment",
+    "published": "2026-02-19",
+    "updated": "2026-02-19",
+    "categories": "cs.IR",
+    "link": "http://arxiv.org/abs/2602.17170v1",
+    "tag_keys": [
+      "judge_reliability_and_calibration",
+      "judge_prompting_protocols"
+    ],
+    "tags": [
+      "Judge Reliability And Calibration",
+      "Judge Prompting Protocols"
+    ]
+  },
+  {
+    "arxiv_id": "2602.17127v1",
+    "title": "The Emergence of Lab-Driven Alignment Signatures: A Psychometric Framework for Auditing Latent Bias and Compounding Risk in Generative AI",
+    "published": "2026-02-19",
+    "updated": "2026-02-19",
+    "categories": "cs.CL",
+    "link": "http://arxiv.org/abs/2602.17127v1",
+    "tag_keys": [
+      "benchmarks_and_datasets",
+      "judge_reliability_and_calibration"
+    ],
+    "tags": [
+      "Benchmark And Dataset Creation",
+      "Judge Reliability And Calibration"
+    ]
+  }
+]
