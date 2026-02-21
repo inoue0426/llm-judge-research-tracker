@@ -1,107 +1,11 @@
 # LLM as a Judge — arXiv Monitor
 
-Last updated: 2026-02-20 (UTC)
+Last updated: 2026-02-21 (UTC)
 Coverage window: last 1 days
 
 Query:
 `ti:"LLM as a judge" OR abs:"LLM as a judge" OR ti:"LLM-as-a-judge" OR abs:"LLM-as-a-judge" OR ti:"large language model as a judge" OR abs:"large language model as a judge" OR ti:"LLM judge" OR abs:"LLM judge" OR ti:"LLM-based evaluation" OR abs:"LLM-based evaluation" OR ti:"LLM evaluation" OR abs:"LLM evaluation"`
 
-Total papers: 6
+Total papers: 0
 
 ## Papers
-
-### Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models (2602.17433v1)
-
-Authors: Francesco Ortu, Joeun Yook, Punya Syon Pandey, et al.
-Published: 2026-02-19
-Updated: 2026-02-19
-Categories: cs.CY
-Link: [arXiv](http://arxiv.org/abs/2602.17433v1)
-
-Abstract: Large language models (LLMs) are increasingly used as sources of historical information, motivating the need for scalable audits on contested events and politically charged narratives in settings that mirror real user interactions. We introduce \textsc{\texttt{HistoricalMisinfo}}, a curated dataset of $500$ contested events from $45$ countries, each paired with a factual reference narrative and a documented revisionist reference narrative. To approximate real-world usage, we instantiate each event in $11$ prompt scenarios that reflect common communication settings (e.g., questions, textbooks, social posts, policy briefs). Using an LLM-as-a-judge protocol that compares model outputs to the two references, we evaluate LLMs varying across model architectures in two conditions: (i) neutral user prompts that ask for factually accurate information, and (ii) robustness prompts in which the user explicitly requests the revisionist version of the event. Under neutral prompts, models are generally closer to factual references, though the resulting scores should be interpreted as reference-alignment signals rather than definitive evidence of human-interpretable revisionism. Robustness prompting yields a strong and consistent effect: when the user requests the revisionist narrative, all evaluated models show sharply higher revisionism scores, indicating limited resistance or self-correction. \textsc{\texttt{HistoricalMisinfo}} provides a practical foundation for benchmarking robustness to revisionist framing and for guiding future work on more precise automatic evaluation of contested historical claims to ensure a sustainable integration of AI systems within society.
-
-Summary:
-Purpose: The paper aims to detect historical revisionism in large language models, which are increasingly used as sources of historical information, by introducing a curated dataset and evaluating model outputs against factual and revisionist references.
-Method: The researchers use an LLM-as-a-judge protocol that compares model outputs to factual and revisionist references across various prompt scenarios, including neutral and robustness prompts, to assess the models' alignment with historical truth.
-Results: The evaluation yields a strong effect, showing that large language models are generally closer to factual references under neutral prompts, but exhibit sharply higher revisionism scores when explicitly requested to provide the revisionist narrative, indicating limited resistance to revisionist framing.
-Tags: Benchmark And Dataset Creation, Robustness And Sensitivity
-
-### Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation (2602.17316v1)
-
-Authors: Bogdan Kostić, Conor Fallon, Julian Risch, et al.
-Published: 2026-02-19
-Updated: 2026-02-19
-Categories: cs.CL, cs.AI
-Link: [arXiv](http://arxiv.org/abs/2602.17316v1)
-
-Abstract: The rapid advancement of Large Language Models (LLMs) has established standardized evaluation benchmarks as the primary instrument for model comparison. Yet, their reliability is increasingly questioned due to sensitivity to shallow variations in input prompts. This paper examines how controlled, truth-conditionally equivalent lexical and syntactic perturbations affect the absolute performance and relative ranking of 23 contemporary LLMs across three benchmarks: MMLU, SQuAD, and AMEGA. We employ two linguistically principled pipelines to generate meaning-preserving variations: one performing synonym substitution for lexical changes, and another using dependency parsing to determine applicable syntactic transformations. Results show that lexical perturbations consistently induce substantial, statistically significant performance degradation across nearly all models and tasks, while syntactic perturbations have more heterogeneous effects, occasionally improving results. Both perturbation types destabilize model leaderboards on complex tasks. Furthermore, model robustness did not consistently scale with model size, revealing strong task dependence. Overall, the findings suggest that LLMs rely more on surface-level lexical patterns than on abstract linguistic competence, underscoring the need for robustness testing as a standard component of LLM evaluation.
-
-Summary:
-Purpose: The paper examines how controlled lexical and syntactic perturbations affect the performance and ranking of Large Language Models (LLMs) across various benchmarks.
-Method: The researchers employ two linguistically principled pipelines to generate meaning-preserving variations, including synonym substitution for lexical changes and dependency parsing for syntactic transformations.
-Results: The results show that lexical perturbations induce substantial performance degradation, while syntactic perturbations have heterogeneous effects, and both types destabilize model leaderboards, revealing the need for robustness testing in LLM evaluation.
-Tags: Robustness And Sensitivity, Metrics And Scoring Methods
-
-### On the Reliability of User-Centric Evaluation of Conversational Recommender Systems (2602.17264v1)
-
-Authors: Michael Müller, Amir Reza Mohammadi, Andreas Peintner, et al.
-Published: 2026-02-19
-Updated: 2026-02-19
-Categories: cs.IR
-Link: [arXiv](http://arxiv.org/abs/2602.17264v1)
-
-Abstract: User-centric evaluation has become a key paradigm for assessing Conversational Recommender Systems (CRS), aiming to capture subjective qualities such as satisfaction, trust, and rapport. To enable scalable evaluation, recent work increasingly relies on third-party annotations of static dialogue logs by crowd workers or large language models. However, the reliability of this practice remains largely unexamined. In this paper, we present a large-scale empirical study investigating the reliability and structure of user-centric CRS evaluation on static dialogue transcripts. We collected 1,053 annotations from 124 crowd workers on 200 ReDial dialogues using the 18-dimensional CRS-Que framework. Using random-effects reliability models and correlation analysis, we quantify the stability of individual dimensions and their interdependencies. Our results show that utilitarian and outcome-oriented dimensions such as accuracy, usefulness, and satisfaction achieve moderate reliability under aggregation, whereas socially grounded constructs such as humanness and rapport are substantially less reliable. Furthermore, many dimensions collapse into a single global quality signal, revealing a strong halo effect in third-party judgments. These findings challenge the validity of single-annotator and LLM-based evaluation protocols and motivate the need for multi-rater aggregation and dimension reduction in offline CRS evaluation.
-
-Summary:
-Purpose: The paper aims to investigate the reliability of user-centric evaluation of Conversational Recommender Systems (CRS) through a large-scale empirical study on static dialogue transcripts.
-Method: The study collected 1,053 annotations from 124 crowd workers on 200 ReDial dialogues using the 18-dimensional CRS-Que framework and employed random-effects reliability models and correlation analysis to quantify the stability of individual dimensions.
-Results: The results show that while utilitarian dimensions achieve moderate reliability, socially grounded constructs are less reliable, and many dimensions collapse into a single global quality signal due to a strong halo effect in third-party judgments.
-Tags: Judge Reliability And Calibration
-
-### Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study (2602.17262v1)
-
-Authors: Kensuke Okada, Yui Furukawa, Kyosuke Bunji
-Published: 2026-02-19
-Updated: 2026-02-19
-Categories: cs.CL, stat.ME
-Link: [arXiv](http://arxiv.org/abs/2602.17262v1)
-
-Abstract: Human self-report questionnaires are increasingly used in NLP to benchmark and audit large language models (LLMs), from persona consistency to safety and bias assessments. Yet these instruments presume honest responding; in evaluative contexts, LLMs can instead gravitate toward socially preferred answers-a form of socially desirable responding (SDR)-biasing questionnaire-derived scores and downstream conclusions. We propose a psychometric framework to quantify and mitigate SDR in questionnaire-based evaluation of LLMs. To quantify SDR, the same inventory is administered under HONEST versus FAKE-GOOD instructions, and SDR is computed as a direction-corrected standardized effect size from item response theory (IRT)-estimated latent scores. This enables comparisons across constructs and response formats, as well as against human instructed-faking benchmarks. For mitigation, we construct a graded forced-choice (GFC) Big Five inventory by selecting 30 cross-domain pairs from an item pool via constrained optimization to match desirability. Across nine instruction-tuned LLMs evaluated on synthetic personas with known target profiles, Likert-style questionnaires show consistently large SDR, whereas desirability-matched GFC substantially attenuates SDR while largely preserving the recovery of the intended persona profiles. These results highlight a model-dependent SDR-recovery trade-off and motivate SDR-aware reporting practices for questionnaire-based benchmarking and auditing of LLMs.
-
-Summary:
-Purpose: The study aims to quantify and mitigate socially desirable responding in large language models (LLMs) when they are evaluated using human self-report questionnaires, which can lead to biased results due to the models' tendency to provide socially preferred answers.
-Method: To address this issue, the researchers propose a psychometric framework that involves administering the same inventory under different instructions and computing socially desirable responding as a standardized effect size from item response theory-estimated latent scores.
-Results: The study finds that using a desirability-matched graded forced-choice inventory substantially attenuates socially desirable responding in LLMs while preserving the recovery of intended persona profiles, highlighting the need for socially desirable responding-aware reporting practices in questionnaire-based benchmarking and auditing of LLMs.
-Tags: Judge Reliability And Calibration, Metrics And Scoring Methods
-
-### When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment (2602.17170v1)
-
-Authors: Chuting Yu, Hang Li, Joel Mackenzie, et al.
-Published: 2026-02-19
-Updated: 2026-02-19
-Categories: cs.IR
-Link: [arXiv](http://arxiv.org/abs/2602.17170v1)
-
-Abstract: Human relevance assessment is time-consuming and cognitively intensive, limiting the scalability of Information Retrieval evaluation. This has led to growing interest in using large language models (LLMs) as proxies for human judges. However, it remains an open question whether LLM-based relevance judgments are reliable, stable, and rigorous enough to match humans for relevance assessment. In this work, we conduct a systematic study of overrating behavior in LLM-based relevance judgments across model backbones, evaluation paradigms (pointwise and pairwise), and passage modification strategies. We show that models consistently assign inflated relevance scores -- often with high confidence -- to passages that do not genuinely satisfy the underlying information need, revealing a system-wide bias rather than random fluctuations in judgment. Furthermore, controlled experiments show that LLM-based relevance judgments can be highly sensitive to passage length and surface-level lexical cues. These results raise concerns about the usage of LLMs as drop-in replacements for human relevance assessors, and highlight the urgent need for careful diagnostic evaluation frameworks when applying LLMs for relevance assessments. Our code and results are publicly available.
-
-Summary:
-Purpose: The paper explores the reliability of large language models (LLMs) as proxies for human judges in relevance assessment, investigating whether LLM-based judgments are stable and rigorous enough to match humans.
-Method: The study conducts a systematic examination of overrating behavior in LLM-based relevance judgments across different model backbones, evaluation paradigms, and passage modification strategies through controlled experiments.
-Results: The results show that LLMs consistently assign inflated relevance scores to passages that do not genuinely satisfy the underlying information need, revealing a system-wide bias and highlighting the need for careful diagnostic evaluation frameworks when using LLMs for relevance assessments.
-Tags: Judge Reliability And Calibration, Judge Prompting Protocols
-
-### The Emergence of Lab-Driven Alignment Signatures: A Psychometric Framework for Auditing Latent Bias and Compounding Risk in Generative AI (2602.17127v1)
-
-Authors: Dusan Bosnjakovic
-Published: 2026-02-19
-Updated: 2026-02-19
-Categories: cs.CL
-Link: [arXiv](http://arxiv.org/abs/2602.17127v1)
-
-Abstract: As Large Language Models (LLMs) transition from standalone chat interfaces to foundational reasoning layers in multi-agent systems and recursive evaluation loops (LLM-as-a-judge), the detection of durable, provider-level behavioral signatures becomes a critical requirement for safety and governance. Traditional benchmarks measure transient task accuracy but fail to capture stable, latent response policies -- the ``prevailing mindsets'' embedded during training and alignment that outlive individual model versions. This paper introduces a novel auditing framework that utilizes psychometric measurement theory -- specifically latent trait estimation under ordinal uncertainty -- to quantify these tendencies without relying on ground-truth labels. Utilizing forced-choice ordinal vignettes masked by semantically orthogonal decoys and governed by cryptographic permutation-invariance, the research audits nine leading models across dimensions including Optimization Bias, Sycophancy, and Status-Quo Legitimization. Using Mixed Linear Models (MixedLM) and Intraclass Correlation Coefficient (ICC) analysis, the research identifies that while item-level framing drives high variance, a persistent ``lab signal'' accounts for significant behavioral clustering. These findings demonstrate that in ``locked-in'' provider ecosystems, latent biases are not merely static errors but compounding variables that risk creating recursive ideological echo chambers in multi-layered AI architectures.
-
-Summary:
-Purpose: The paper aims to detect durable, provider-level behavioral signatures in Large Language Models (LLMs) that can capture stable, latent response policies embedded during training and alignment.
-Method: The research introduces a novel auditing framework that utilizes psychometric measurement theory, specifically latent trait estimation under ordinal uncertainty, to quantify these tendencies without relying on ground-truth labels.
-Results: The study identifies a persistent "lab signal" that accounts for significant behavioral clustering, demonstrating that latent biases in LLMs are not merely static errors but compounding variables that risk creating recursive ideological echo chambers in multi-layered AI architectures.
-Tags: Benchmark And Dataset Creation, Judge Reliability And Calibration

@@ -14,17 +14,17 @@ Output:
 Automation:
 - GitHub Actions workflow formats Python on push.
 
-## Subclass Counts (Latest Window)
+## Subclass Counts (All Daily Reports)
 
 <!-- TAG_STATS_START -->
 ```mermaid
-pie title LLM-as-a-Judge Subclass Counts
-    "Judge Reliability And Calibration" : 17
-    "Benchmark And Dataset Creation" : 16
-    "Judge Prompting Protocols" : 8
-    "Metrics And Scoring Methods" : 8
-    "Domain-Specific Judging" : 3
-    "Robustness And Sensitivity" : 2
+pie title LLM-as-a-Judge Subclass Counts (Total 101)
+    "Judge Reliability And Calibration (33)" : 33
+    "Benchmark And Dataset Creation (30)" : 30
+    "Metrics And Scoring Methods (15)" : 15
+    "Judge Prompting Protocols (12)" : 12
+    "Robustness And Sensitivity (6)" : 6
+    "Domain-Specific Judging (5)" : 5
 ```
 <!-- TAG_STATS_END -->
 
@@ -34,13 +34,14 @@ pie title LLM-as-a-Judge Subclass Counts
 ```mermaid
 xychart-beta
     title "Subclass Cumulative Counts (Daily)"
-    x-axis ["2026-02-19", "2026-02-20"]
-    y-axis "Papers" 0 --> 6
-    series "Judge Reliability And Calibration" [3, 6]
-    series "Metrics And Scoring Methods" [2, 4]
-    series "Robustness And Sensitivity" [2, 4]
-    series "Benchmark And Dataset Creation" [1, 2]
-    series "Judge Prompting Protocols" [1, 2]
+    x-axis ["2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20"]
+    y-axis "Papers" 0 --> 33
+    line "Judge Reliability And Calibration" [3, 5, 7, 8, 9, 11, 14, 20, 23, 33]
+    line "Benchmark And Dataset Creation" [5, 7, 8, 9, 10, 13, 17, 22, 23, 30]
+    line "Metrics And Scoring Methods" [1, 3, 4, 4, 5, 5, 9, 10, 12, 15]
+    line "Judge Prompting Protocols" [1, 1, 3, 6, 7, 9, 10, 10, 11, 12]
+    line "Robustness And Sensitivity" [1, 1, 2, 2, 2, 2, 2, 2, 4, 6]
+    line "Other" [0, 0, 1, 1, 2, 3, 3, 4, 4, 5]
 ```
 <!-- TAG_TREND_END -->
 

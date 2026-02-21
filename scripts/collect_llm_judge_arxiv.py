@@ -877,16 +877,18 @@ def render_tag_pie_chart(tag_counts: Dict[str, int]) -> str:
     Returns:
         Mermaid chart block.
     """
+    total = sum(tag_counts.values())
+    title = f"LLM-as-a-Judge Subclass Counts (Total {total})"
     lines = [
         "```mermaid",
-        "pie title LLM-as-a-Judge Subclass Counts",
+        f"pie title {title}",
     ]
     if not tag_counts:
         tag_counts = {"Unclassified": 0}
     for label, count in sorted(
         tag_counts.items(), key=lambda item: (-item[1], item[0])
     ):
-        lines.append(f'    "{label}" : {count}')
+        lines.append(f'    "{label} ({count})" : {count}')
     lines.append("```")
     return "\n".join(lines)
 
@@ -914,6 +916,62 @@ def update_readme_tag_chart(readme_path: str, tag_counts: Dict[str, int]) -> Non
     path.write_text(updated, encoding="utf-8")
 
 
+def aggregate_tag_counts(daily_counts: Dict[dt.date, Dict[str, int]]) -> Dict[str, int]:
+    """Aggregate tag counts across dates.
+
+    Args:
+        daily_counts: Date to tag counts.
+
+    Returns:
+        Aggregated tag counts.
+    """
+    totals: Dict[str, int] = {}
+    for counts in daily_counts.values():
+        for tag, count in counts.items():
+            totals[tag] = totals.get(tag, 0) + count
+    return totals
+
+
+def parse_daily_papers(markdown: str) -> List[Dict[str, str]]:
+    """Parse paper fields from a daily Markdown report.
+
+    Args:
+        markdown: Daily report contents.
+
+    Returns:
+        List of paper dicts with title, abstract, purpose, method, results.
+    """
+    papers: List[Dict[str, str]] = []
+    current: Dict[str, str] = {}
+    for line in markdown.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("### "):
+            if current:
+                papers.append(current)
+            title = stripped[4:]
+            if "(" in title and title.endswith(")"):
+                title = title.rsplit("(", 1)[0].strip()
+            current = {"title": title}
+            continue
+        if not current:
+            continue
+        if stripped.startswith("Abstract:"):
+            current["abstract"] = stripped.split(":", 1)[1].strip()
+            continue
+        if stripped.startswith("Purpose:"):
+            current["purpose"] = stripped.split(":", 1)[1].strip()
+            continue
+        if stripped.startswith("Method:"):
+            current["method"] = stripped.split(":", 1)[1].strip()
+            continue
+        if stripped.startswith("Results:"):
+            current["results"] = stripped.split(":", 1)[1].strip()
+            continue
+    if current:
+        papers.append(current)
+    return papers
+
+
 def read_daily_tag_counts(daily_dir: str) -> Dict[dt.date, Dict[str, int]]:
     """Read daily tag counts from daily reports.
 
@@ -933,9 +991,13 @@ def read_daily_tag_counts(daily_dir: str) -> Dict[dt.date, Dict[str, int]]:
         try:
             report_date = dt.date.fromisoformat(entry.stem)
         except ValueError:
-            continue
+            try:
+                report_date = dt.date.fromisoformat(entry.stem[:10])
+            except ValueError:
+                continue
         counts: Dict[str, int] = {}
-        for line in entry.read_text(encoding="utf-8").splitlines():
+        lines = entry.read_text(encoding="utf-8").splitlines()
+        for line in lines:
             line = line.strip()
             if not line.startswith("Tags:"):
                 continue
@@ -946,6 +1008,17 @@ def read_daily_tag_counts(daily_dir: str) -> Dict[dt.date, Dict[str, int]]:
                 if not tag:
                     continue
                 counts[tag] = counts.get(tag, 0) + 1
+        if not counts:
+            papers = parse_daily_papers("\n".join(lines))
+            for paper in papers:
+                title = paper.get("title", "")
+                abstract = paper.get("abstract", "")
+                purpose = paper.get("purpose", "")
+                method = paper.get("method", "")
+                results = paper.get("results", "")
+                _, labels = classify_tags(title, abstract, purpose, method, results)
+                for tag in labels:
+                    counts[tag] = counts.get(tag, 0) + 1
         if counts:
             series[report_date] = counts
     return series
@@ -963,16 +1036,16 @@ def build_cumulative_series(
         Tuple of ordered dates and tag-to-cumulative list.
     """
     dates = sorted(daily_counts.keys())
-    totals: Dict[str, int] = {}
-    series: Dict[str, List[int]] = {}
+    all_tags: List[str] = sorted(
+        {tag for counts in daily_counts.values() for tag in counts}
+    )
+    totals: Dict[str, int] = {tag: 0 for tag in all_tags}
+    series: Dict[str, List[int]] = {tag: [] for tag in all_tags}
     for day in dates:
         for tag, count in daily_counts[day].items():
             totals[tag] = totals.get(tag, 0) + count
-        for tag, total in totals.items():
-            series.setdefault(tag, []).append(total)
-        for tag in list(series.keys()):
-            if tag not in totals:
-                series[tag].append(series[tag][-1])
+        for tag in all_tags:
+            series[tag].append(totals.get(tag, 0))
     return dates, series
 
 
@@ -1010,12 +1083,12 @@ def render_tag_trend_chart(dates: List[dt.date], series: Dict[str, List[int]]) -
     lines.append(f'    y-axis "Papers" 0 --> {max_value}')
     for tag in top_tags:
         values = series.get(tag, [])
-        lines.append(f'    series "{tag}" [{", ".join(str(v) for v in values)}]')
+        lines.append(f'    line "{tag}" [{", ".join(str(v) for v in values)}]')
     if other_tags:
         other_values: List[int] = []
         for idx in range(len(dates)):
             other_values.append(sum(series[tag][idx] for tag in other_tags))
-        lines.append(f'    series "Other" [{", ".join(str(v) for v in other_values)}]')
+        lines.append(f'    line "Other" [{", ".join(str(v) for v in other_values)}]')
     lines.append("```")
     return "\n".join(lines)
 
@@ -1085,6 +1158,11 @@ def parse_args() -> argparse.Namespace:
         help="Skip existing daily files when backfilling.",
     )
     parser.add_argument("--readme-path", type=str, default=DEFAULT_README_PATH)
+    parser.add_argument(
+        "--refresh-readme-only",
+        action="store_true",
+        help="Rebuild README charts from existing daily reports without re-summarizing.",
+    )
     parser.add_argument("--ollama-endpoint", type=str, default=OLLAMA_ENDPOINT)
     parser.add_argument("--ollama-model", type=str, default=OLLAMA_MODEL)
     parser.add_argument("--no-llm", action="store_true")
@@ -1116,11 +1194,29 @@ def ensure_ollama_available(endpoint: str) -> None:
 def main() -> None:
     """Run the collection pipeline."""
     args = parse_args()
+    if args.refresh_readme_only:
+        daily_counts = read_daily_tag_counts(args.daily_dir)
+        update_readme_tag_chart(args.readme_path, aggregate_tag_counts(daily_counts))
+        update_readme_tag_trend(args.readme_path, args.daily_dir)
+        return
+    report_date = dt.datetime.now(dt.timezone.utc).date()
+    daily_path = f"{args.daily_dir}/{report_date.isoformat()}.md"
+    if args.backfill_days == 0 and pathlib.Path(daily_path).exists():
+        return
+    if args.backfill_days > 0 and args.backfill_skip_existing:
+        all_exist = True
+        for offset in range(args.backfill_days):
+            day = report_date - dt.timedelta(days=offset)
+            path = pathlib.Path(f"{args.daily_dir}/{day.isoformat()}.md")
+            if not path.exists():
+                all_exist = False
+                break
+        if all_exist:
+            return
     if args.require_llm and args.no_llm:
         raise RuntimeError("Cannot use --require-llm with --no-llm.")
     if args.require_llm:
         ensure_ollama_available(args.ollama_endpoint)
-    report_date = dt.datetime.now(dt.timezone.utc).date()
     max_days = max(args.days_back, args.backfill_days)
     summaries_all = collect_papers(
         days_back=max_days,
@@ -1139,7 +1235,8 @@ def main() -> None:
     write_text(args.output, markdown)
     write_text(args.tags_json, render_tags_json(summaries))
     write_text(args.tags_csv, render_tags_csv(summaries))
-    update_readme_tag_chart(args.readme_path, build_tag_counts(summaries_all))
+    daily_counts = read_daily_tag_counts(args.daily_dir)
+    update_readme_tag_chart(args.readme_path, aggregate_tag_counts(daily_counts))
     update_readme_tag_trend(args.readme_path, args.daily_dir)
     if args.backfill_days > 0:
         for offset in range(args.backfill_days):
