@@ -8,6 +8,7 @@ import datetime as dt
 import json
 import pathlib
 import re
+import os
 from typing import Dict, Iterable, List, Optional, Sequence
 
 import arxiv
@@ -32,6 +33,8 @@ DEFAULT_DAILY_INDEX_PATH = "reports/daily/index.md"
 DEFAULT_BACKFILL_DAYS = 0
 DEFAULT_BACKFILL_SKIP_EXISTING = True
 DEFAULT_README_PATH = "README.md"
+DEFAULT_FIGURE_DIR = "reports/figures"
+DEFAULT_TREND_IMAGE = "reports/figures/subclass_cumulative_monthly.png"
 TAG_STATS_START = "<!-- TAG_STATS_START -->"
 TAG_STATS_END = "<!-- TAG_STATS_END -->"
 TAG_TREND_START = "<!-- TAG_TREND_START -->"
@@ -1132,6 +1135,57 @@ def render_tag_trend_chart(
     return "\n".join(lines), legend
 
 
+def render_trend_image(
+    labels: List[str],
+    series: Dict[str, List[int]],
+    output_path: str,
+    title: str,
+) -> None:
+    """Render a cumulative trend image.
+
+    Args:
+        labels: Ordered x-axis labels.
+        series: Tag to cumulative values.
+        output_path: Output image path.
+        title: Chart title.
+    """
+    if not labels or not series:
+        return
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    final_counts = {tag: values[-1] for tag, values in series.items()}
+    sorted_tags = sorted(final_counts.items(), key=lambda item: (-item[1], item[0]))
+    top_tags = [tag for tag, _ in sorted_tags[:TAG_TREND_TOP_N]]
+    other_tags = [tag for tag, _ in sorted_tags[TAG_TREND_TOP_N:]]
+    ordered = list(top_tags)
+    if other_tags:
+        ordered.append("Other")
+
+    data: Dict[str, List[int]] = {}
+    for tag in top_tags:
+        data[tag] = series.get(tag, [])
+    if other_tags:
+        other_values: List[int] = []
+        for idx in range(len(labels)):
+            other_values.append(sum(series[tag][idx] for tag in other_tags))
+        data["Other"] = other_values
+
+    plt.figure(figsize=(10, 5))
+    for tag in ordered:
+        plt.plot(labels, data[tag], marker="o", label=tag)
+    plt.title(title)
+    plt.ylabel("Papers")
+    plt.xticks(rotation=45, ha="right")
+    plt.legend(loc="upper left", bbox_to_anchor=(1.02, 1), borderaxespad=0)
+    plt.tight_layout()
+    pathlib.Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(output_path, dpi=160)
+    plt.close()
+
+
 def update_readme_tag_trend(readme_path: str, daily_dir: str) -> None:
     """Update README with tag trend chart.
 
@@ -1149,13 +1203,16 @@ def update_readme_tag_trend(readme_path: str, daily_dir: str) -> None:
         return
     daily_counts = read_daily_tag_counts(daily_dir)
     labels, series = build_cumulative_monthly_series(daily_counts)
-    chart, legend = render_tag_trend_chart(
-        labels, series, title="Subclass Cumulative Counts (Monthly)"
+    chart_title = "Subclass Cumulative Counts (Monthly)"
+    render_trend_image(labels, series, DEFAULT_TREND_IMAGE, title=chart_title)
+    image_block = "\n".join(
+        [
+            f"![Subclass Cumulative Trend]({DEFAULT_TREND_IMAGE})",
+            "",
+            "_This image is auto-generated from reports/daily data._",
+        ]
     )
-    legend_line = ""
-    if legend:
-        legend_line = f"\nLegend: {', '.join(legend)}"
-    replacement = f"{TAG_TREND_START}\n{chart}{legend_line}\n{TAG_TREND_END}"
+    replacement = f"{TAG_TREND_START}\n{image_block}\n{TAG_TREND_END}"
     updated = (
         content[:start_index] + replacement + content[end_index + len(TAG_TREND_END) :]
     )

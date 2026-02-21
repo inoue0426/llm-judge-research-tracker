@@ -26,25 +26,15 @@ pie title LLM-as-a-Judge Subclass Counts (Total 101)
     "Robustness And Sensitivity (6)" : 6
     "Domain-Specific Judging (5)" : 5
 ```
-Legend: Judge Reliability And Calibration (33), Benchmark And Dataset Creation (30), Metrics And Scoring Methods (15), Judge Prompting Protocols (12), Robustness And Sensitivity (6), Domain-Specific Judging (5)
+Legend (Series Order): 1. Judge Reliability And Calibration (33) | 2. Benchmark And Dataset Creation (30) | 3. Metrics And Scoring Methods (15) | 4. Judge Prompting Protocols (12) | 5. Robustness And Sensitivity (6) | 6. Domain-Specific Judging (5)
 <!-- TAG_STATS_END -->
 
 ## Subclass Cumulative Trend (Monthly)
 
 <!-- TAG_TREND_START -->
-```mermaid
-xychart-beta
-    title "Subclass Cumulative Counts (Monthly)"
-    x-axis ["2026-02"]
-    y-axis "Papers" 0 --> 33
-    bar "Judge Reliability And Calibration" [33]
-    bar "Benchmark And Dataset Creation" [30]
-    bar "Metrics And Scoring Methods" [15]
-    bar "Judge Prompting Protocols" [12]
-    bar "Robustness And Sensitivity" [6]
-    bar "Other" [5]
-```
-Legend (Series Order): 1. Judge Reliability And Calibration | 2. Benchmark And Dataset Creation | 3. Metrics And Scoring Methods | 4. Judge Prompting Protocols | 5. Robustness And Sensitivity | 6. Other
+![Subclass Cumulative Trend](reports/figures/subclass_cumulative_monthly.png)
+
+_This image is auto-generated from reports/daily data._
 <!-- TAG_TREND_END -->
 
 ## LLM-as-a-Judge Design Overview
