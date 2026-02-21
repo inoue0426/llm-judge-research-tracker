@@ -28,21 +28,22 @@ pie title LLM-as-a-Judge Subclass Counts (Total 101)
 ```
 <!-- TAG_STATS_END -->
 
-## Subclass Cumulative Trend
+## Subclass Cumulative Trend (Monthly)
 
 <!-- TAG_TREND_START -->
 ```mermaid
 xychart-beta
-    title "Subclass Cumulative Counts (Daily)"
-    x-axis ["2026-02-11", "2026-02-12", "2026-02-13", "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20"]
+    title "Subclass Cumulative Counts (Monthly)"
+    x-axis ["2026-02"]
     y-axis "Papers" 0 --> 33
-    line "Judge Reliability And Calibration" [3, 5, 7, 8, 9, 11, 14, 20, 23, 33]
-    line "Benchmark And Dataset Creation" [5, 7, 8, 9, 10, 13, 17, 22, 23, 30]
-    line "Metrics And Scoring Methods" [1, 3, 4, 4, 5, 5, 9, 10, 12, 15]
-    line "Judge Prompting Protocols" [1, 1, 3, 6, 7, 9, 10, 10, 11, 12]
-    line "Robustness And Sensitivity" [1, 1, 2, 2, 2, 2, 2, 2, 4, 6]
-    line "Other" [0, 0, 1, 1, 2, 3, 3, 4, 4, 5]
+    bar "Judge Reliability And Calibration" [33]
+    bar "Benchmark And Dataset Creation" [30]
+    bar "Metrics And Scoring Methods" [15]
+    bar "Judge Prompting Protocols" [12]
+    bar "Robustness And Sensitivity" [6]
+    bar "Other" [5]
 ```
+Legend: Judge Reliability And Calibration, Benchmark And Dataset Creation, Metrics And Scoring Methods, Judge Prompting Protocols, Robustness And Sensitivity, Other
 <!-- TAG_TREND_END -->
 
 ## LLM-as-a-Judge Design Overview

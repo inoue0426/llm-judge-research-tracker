@@ -1049,22 +1049,54 @@ def build_cumulative_series(
     return dates, series
 
 
-def render_tag_trend_chart(dates: List[dt.date], series: Dict[str, List[int]]) -> str:
+def build_cumulative_monthly_series(
+    daily_counts: Dict[dt.date, Dict[str, int]]
+) -> tuple[List[str], Dict[str, List[int]]]:
+    """Build cumulative monthly series from daily counts.
+
+    Args:
+        daily_counts: Date to tag counts.
+
+    Returns:
+        Tuple of ordered month labels and tag-to-cumulative list.
+    """
+    monthly: Dict[str, Dict[str, int]] = {}
+    for day, counts in daily_counts.items():
+        month = day.strftime("%Y-%m")
+        bucket = monthly.setdefault(month, {})
+        for tag, count in counts.items():
+            bucket[tag] = bucket.get(tag, 0) + count
+    months = sorted(monthly.keys())
+    all_tags: List[str] = sorted({tag for counts in monthly.values() for tag in counts})
+    totals: Dict[str, int] = {tag: 0 for tag in all_tags}
+    series: Dict[str, List[int]] = {tag: [] for tag in all_tags}
+    for month in months:
+        for tag, count in monthly[month].items():
+            totals[tag] = totals.get(tag, 0) + count
+        for tag in all_tags:
+            series[tag].append(totals.get(tag, 0))
+    return months, series
+
+
+def render_tag_trend_chart(
+    labels: List[str], series: Dict[str, List[int]], title: str
+) -> tuple[str, List[str]]:
     """Render a Mermaid xychart for cumulative tag counts.
 
     Args:
-        dates: Ordered dates.
+        labels: Ordered x-axis labels.
         series: Tag to cumulative values.
+        title: Chart title.
 
     Returns:
-        Mermaid chart block.
+        Tuple of Mermaid chart block and legend labels.
     """
     lines = [
         "```mermaid",
-        'xychart-beta',
-        '    title "Subclass Cumulative Counts (Daily)"',
+        "xychart-beta",
+        f'    title "{title}"',
     ]
-    if not dates or not series:
+    if not labels or not series:
         lines.extend(
             [
                 "    x-axis []",
@@ -1072,8 +1104,7 @@ def render_tag_trend_chart(dates: List[dt.date], series: Dict[str, List[int]]) -
                 "```",
             ]
         )
-        return "\n".join(lines)
-    labels = [date.isoformat() for date in dates]
+        return "\n".join(lines), []
     lines.append(f"    x-axis [{', '.join(f'\"{label}\"' for label in labels)}]")
     final_counts = {tag: values[-1] for tag, values in series.items()}
     sorted_tags = sorted(final_counts.items(), key=lambda item: (-item[1], item[0]))
@@ -1083,14 +1114,16 @@ def render_tag_trend_chart(dates: List[dt.date], series: Dict[str, List[int]]) -
     lines.append(f'    y-axis "Papers" 0 --> {max_value}')
     for tag in top_tags:
         values = series.get(tag, [])
-        lines.append(f'    line "{tag}" [{", ".join(str(v) for v in values)}]')
+        lines.append(f'    bar "{tag}" [{", ".join(str(v) for v in values)}]')
+    legend = list(top_tags)
     if other_tags:
         other_values: List[int] = []
-        for idx in range(len(dates)):
+        for idx in range(len(labels)):
             other_values.append(sum(series[tag][idx] for tag in other_tags))
-        lines.append(f'    line "Other" [{", ".join(str(v) for v in other_values)}]')
+        lines.append(f'    bar "Other" [{", ".join(str(v) for v in other_values)}]')
+        legend.append("Other")
     lines.append("```")
-    return "\n".join(lines)
+    return "\n".join(lines), legend
 
 
 def update_readme_tag_trend(readme_path: str, daily_dir: str) -> None:
@@ -1109,13 +1142,16 @@ def update_readme_tag_trend(readme_path: str, daily_dir: str) -> None:
     if start_index == -1 or end_index == -1 or end_index <= start_index:
         return
     daily_counts = read_daily_tag_counts(daily_dir)
-    dates, series = build_cumulative_series(daily_counts)
-    chart = render_tag_trend_chart(dates, series)
-    replacement = f"{TAG_TREND_START}\n{chart}\n{TAG_TREND_END}"
+    labels, series = build_cumulative_monthly_series(daily_counts)
+    chart, legend = render_tag_trend_chart(
+        labels, series, title="Subclass Cumulative Counts (Monthly)"
+    )
+    legend_line = ""
+    if legend:
+        legend_line = f"\nLegend: {', '.join(legend)}"
+    replacement = f"{TAG_TREND_START}\n{chart}{legend_line}\n{TAG_TREND_END}"
     updated = (
-        content[:start_index]
-        + replacement
-        + content[end_index + len(TAG_TREND_END) :]
+        content[:start_index] + replacement + content[end_index + len(TAG_TREND_END) :]
     )
     path.write_text(updated, encoding="utf-8")
 
