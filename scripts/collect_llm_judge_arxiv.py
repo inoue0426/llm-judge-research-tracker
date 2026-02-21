@@ -868,7 +868,7 @@ def build_tag_counts(summaries: Sequence[PaperSummary]) -> Dict[str, int]:
     return counts
 
 
-def render_tag_pie_chart(tag_counts: Dict[str, int]) -> str:
+def render_tag_pie_chart(tag_counts: Dict[str, int]) -> tuple[str, List[str]]:
     """Render a Mermaid pie chart for tag counts.
 
     Args:
@@ -885,12 +885,14 @@ def render_tag_pie_chart(tag_counts: Dict[str, int]) -> str:
     ]
     if not tag_counts:
         tag_counts = {"Unclassified": 0}
+    legend = []
     for label, count in sorted(
         tag_counts.items(), key=lambda item: (-item[1], item[0])
     ):
         lines.append(f'    "{label} ({count})" : {count}')
+        legend.append(f"{label} ({count})")
     lines.append("```")
-    return "\n".join(lines)
+    return "\n".join(lines), legend
 
 
 def update_readme_tag_chart(readme_path: str, tag_counts: Dict[str, int]) -> None:
@@ -908,8 +910,12 @@ def update_readme_tag_chart(readme_path: str, tag_counts: Dict[str, int]) -> Non
     end_index = content.find(TAG_STATS_END)
     if start_index == -1 or end_index == -1 or end_index <= start_index:
         return
-    chart = render_tag_pie_chart(tag_counts)
-    replacement = f"{TAG_STATS_START}\n{chart}\n{TAG_STATS_END}"
+    chart, legend = render_tag_pie_chart(tag_counts)
+    legend_line = ""
+    if legend:
+        numbered = [f"{idx + 1}. {name}" for idx, name in enumerate(legend)]
+        legend_line = f"\nLegend (Series Order): " + " | ".join(numbered)
+    replacement = f"{TAG_STATS_START}\n{chart}{legend_line}\n{TAG_STATS_END}"
     updated = (
         content[:start_index] + replacement + content[end_index + len(TAG_STATS_END) :]
     )
