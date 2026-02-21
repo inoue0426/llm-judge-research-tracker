@@ -29,6 +29,39 @@ pie title LLM-as-a-Judge Subclass Counts (Total 101)
 Legend (Series Order): 1. Judge Reliability And Calibration (33) | 2. Benchmark And Dataset Creation (30) | 3. Metrics And Scoring Methods (15) | 4. Judge Prompting Protocols (12) | 5. Robustness And Sensitivity (6) | 6. Domain-Specific Judging (5)
 <!-- TAG_STATS_END -->
 
+## Subclass Summaries
+
+- Judge Prompting Protocols: How to prompt or structure judges to improve reliability and consistency. Example topics: rubrics, pairwise prompts, calibration prompts, chain-of-thought constraints.
+- Robustness And Sensitivity: Sensitivity to surface changes or adversarial inputs. Example topics: lexical/syntactic perturbations, prompt sensitivity, adversarial stress tests.
+- Benchmark And Dataset Creation: New datasets and benchmarks for LLM evaluation. Example topics: curated corpora, evaluation suites, domain benchmarks.
+- Judge Reliability And Calibration: Agreement with humans, bias analysis, and calibration of judge scores. Example topics: inter-annotator agreement, bias audits, calibration curves.
+- Domain-Specific Judging: Applying LLM-as-a-judge to specialized domains. Example topics: medical, legal, education, software, history.
+- Multi-Judge Or Ensemble Methods: Combining multiple judges/models to reduce variance and bias. Example topics: ensemble voting, consensus, multi-judge aggregation.
+- Metrics And Scoring Methods: New scoring functions or evaluation metrics. Example topics: probabilistic scoring, metric design, scoring reliability.
+
+### Representative Papers (Auto)
+
+<!-- CATEGORY_SUMMARY_START -->
+- Benchmark And Dataset Creation: Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models; Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models; The Emergence of Lab-Driven Alignment Signatures: A Psychometric Framework for Auditing Latent Bias and Compounding Risk in Generative AI
+- Domain-Specific Judging: LiveClin: A Live Clinical Benchmark without Leakage; LiveClin: A Live Clinical Benchmark without Leakage; Assessing Large Language Models for Medical QA: Zero-Shot and LLM-as-a-Judge Evaluation
+- Judge Prompting Protocols: When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment; When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment; Multi-Objective Alignment of Language Models for Personalized Psychotherapy
+- Judge Reliability And Calibration: On the Reliability of User-Centric Evaluation of Conversational Recommender Systems; Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study; When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment
+- Metrics And Scoring Methods: Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation; Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study; Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation
+- Robustness And Sensitivity: Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models; Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation; Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models
+<!-- CATEGORY_SUMMARY_END -->
+
+### Weekly Trend Summary (Auto)
+
+<!-- WEEKLY_TREND_START -->
+- Week ending 2026-02-20 (UTC).
+- Benchmark And Dataset Creation: 22 (+14 vs prior week)
+- Domain-Specific Judging: 4 (+3 vs prior week)
+- Judge Prompting Protocols: 9 (+6 vs prior week)
+- Judge Reliability And Calibration: 26 (+19 vs prior week)
+- Metrics And Scoring Methods: 11 (+7 vs prior week)
+- Robustness And Sensitivity: 4 (+2 vs prior week)
+<!-- WEEKLY_TREND_END -->
+
 ## Subclass Cumulative Trend (Monthly)
 
 <!-- TAG_TREND_START -->

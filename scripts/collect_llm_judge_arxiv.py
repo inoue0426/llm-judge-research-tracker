@@ -40,6 +40,10 @@ TAG_STATS_END = "<!-- TAG_STATS_END -->"
 TAG_TREND_START = "<!-- TAG_TREND_START -->"
 TAG_TREND_END = "<!-- TAG_TREND_END -->"
 TAG_TREND_TOP_N = 5
+CATEGORY_SUMMARY_START = "<!-- CATEGORY_SUMMARY_START -->"
+CATEGORY_SUMMARY_END = "<!-- CATEGORY_SUMMARY_END -->"
+WEEKLY_TREND_START = "<!-- WEEKLY_TREND_START -->"
+WEEKLY_TREND_END = "<!-- WEEKLY_TREND_END -->"
 CACHE_DIR = ".cache/llm_judge_arxiv"
 OLLAMA_ENDPOINT = "http://localhost:11434"
 OLLAMA_MODEL = "llama3.3"
@@ -964,6 +968,9 @@ def parse_daily_papers(markdown: str) -> List[Dict[str, str]]:
             continue
         if not current:
             continue
+        if stripped.startswith("Published:"):
+            current["published"] = stripped.split(":", 1)[1].strip()
+            continue
         if stripped.startswith("Abstract:"):
             current["abstract"] = stripped.split(":", 1)[1].strip()
             continue
@@ -975,6 +982,9 @@ def parse_daily_papers(markdown: str) -> List[Dict[str, str]]:
             continue
         if stripped.startswith("Results:"):
             current["results"] = stripped.split(":", 1)[1].strip()
+            continue
+        if stripped.startswith("Tags:"):
+            current["tags"] = stripped.split(":", 1)[1].strip()
             continue
     if current:
         papers.append(current)
@@ -1031,6 +1041,105 @@ def read_daily_tag_counts(daily_dir: str) -> Dict[dt.date, Dict[str, int]]:
         if counts:
             series[report_date] = counts
     return series
+
+
+def read_daily_papers(daily_dir: str) -> List[Dict[str, str]]:
+    """Read all papers from daily reports.
+
+    Args:
+        daily_dir: Directory containing daily reports.
+
+    Returns:
+        List of parsed paper dicts.
+    """
+    path = pathlib.Path(daily_dir)
+    papers: List[Dict[str, str]] = []
+    if not path.exists():
+        return papers
+    for entry in path.glob("*.md"):
+        if entry.name == "index.md":
+            continue
+        content = entry.read_text(encoding="utf-8")
+        papers.extend(parse_daily_papers(content))
+    return papers
+
+
+def render_category_summary(papers: List[Dict[str, str]]) -> str:
+    """Render representative titles per subclass.
+
+    Args:
+        papers: Parsed papers.
+
+    Returns:
+        Markdown list block.
+    """
+    by_tag: Dict[str, List[Dict[str, str]]] = {}
+    for paper in papers:
+        title = paper.get("title", "Untitled")
+        published = paper.get("published", "")
+        tags_raw = paper.get("tags", "")
+        tags = [tag.strip() for tag in tags_raw.split(",") if tag.strip()]
+        if not tags:
+            abstract = paper.get("abstract", "")
+            purpose = paper.get("purpose", "")
+            method = paper.get("method", "")
+            results = paper.get("results", "")
+            _, labels = classify_tags(title, abstract, purpose, method, results)
+            tags = labels
+        for tag in tags:
+            by_tag.setdefault(tag, []).append(
+                {"title": title, "published": published}
+            )
+    lines: List[str] = []
+    for tag in sorted(by_tag.keys()):
+        entries = sorted(
+            by_tag[tag],
+            key=lambda item: item.get("published", ""),
+            reverse=True,
+        )
+        picked = entries[:3]
+        titles = "; ".join(item["title"] for item in picked)
+        lines.append(f"- {tag}: {titles}")
+    return "\n".join(lines)
+
+
+def render_weekly_trend(daily_counts: Dict[dt.date, Dict[str, int]]) -> str:
+    """Render weekly trend summary from daily counts.
+
+    Args:
+        daily_counts: Date to tag counts.
+
+    Returns:
+        Markdown list block.
+    """
+    if not daily_counts:
+        return "- No data available."
+    dates = sorted(daily_counts.keys())
+    end_date = dates[-1]
+    start_current = end_date - dt.timedelta(days=6)
+    start_prev = end_date - dt.timedelta(days=13)
+    current: Dict[str, int] = {}
+    previous: Dict[str, int] = {}
+    for day, counts in daily_counts.items():
+        if start_current <= day <= end_date:
+            target = current
+        elif start_prev <= day < start_current:
+            target = previous
+        else:
+            continue
+        for tag, count in counts.items():
+            target[tag] = target.get(tag, 0) + count
+    tags = sorted({*current.keys(), *previous.keys()})
+    lines = [
+        f"- Week ending {end_date.isoformat()} (UTC).",
+    ]
+    for tag in tags:
+        cur = current.get(tag, 0)
+        prev = previous.get(tag, 0)
+        delta = cur - prev
+        sign = "+" if delta >= 0 else ""
+        lines.append(f"- {tag}: {cur} ({sign}{delta} vs prior week)")
+    return "\n".join(lines)
 
 
 def build_cumulative_series(
@@ -1219,6 +1328,58 @@ def update_readme_tag_trend(readme_path: str, daily_dir: str) -> None:
     path.write_text(updated, encoding="utf-8")
 
 
+def update_readme_category_summary(readme_path: str, daily_dir: str) -> None:
+    """Update README with representative titles per subclass.
+
+    Args:
+        readme_path: README path.
+        daily_dir: Directory containing daily reports.
+    """
+    path = pathlib.Path(readme_path)
+    if not path.exists():
+        return
+    content = path.read_text(encoding="utf-8")
+    start_index = content.find(CATEGORY_SUMMARY_START)
+    end_index = content.find(CATEGORY_SUMMARY_END)
+    if start_index == -1 or end_index == -1 or end_index <= start_index:
+        return
+    papers = read_daily_papers(daily_dir)
+    summary_block = render_category_summary(papers)
+    replacement = f"{CATEGORY_SUMMARY_START}\n{summary_block}\n{CATEGORY_SUMMARY_END}"
+    updated = (
+        content[:start_index]
+        + replacement
+        + content[end_index + len(CATEGORY_SUMMARY_END) :]
+    )
+    path.write_text(updated, encoding="utf-8")
+
+
+def update_readme_weekly_trend(readme_path: str, daily_dir: str) -> None:
+    """Update README with weekly trend summary.
+
+    Args:
+        readme_path: README path.
+        daily_dir: Directory containing daily reports.
+    """
+    path = pathlib.Path(readme_path)
+    if not path.exists():
+        return
+    content = path.read_text(encoding="utf-8")
+    start_index = content.find(WEEKLY_TREND_START)
+    end_index = content.find(WEEKLY_TREND_END)
+    if start_index == -1 or end_index == -1 or end_index <= start_index:
+        return
+    daily_counts = read_daily_tag_counts(daily_dir)
+    weekly_block = render_weekly_trend(daily_counts)
+    replacement = f"{WEEKLY_TREND_START}\n{weekly_block}\n{WEEKLY_TREND_END}"
+    updated = (
+        content[:start_index]
+        + replacement
+        + content[end_index + len(WEEKLY_TREND_END) :]
+    )
+    path.write_text(updated, encoding="utf-8")
+
+
 def write_text(path: str, content: str) -> None:
     """Write text to disk, creating directories if needed.
 
@@ -1297,6 +1458,8 @@ def main() -> None:
         daily_counts = read_daily_tag_counts(args.daily_dir)
         update_readme_tag_chart(args.readme_path, aggregate_tag_counts(daily_counts))
         update_readme_tag_trend(args.readme_path, args.daily_dir)
+        update_readme_category_summary(args.readme_path, args.daily_dir)
+        update_readme_weekly_trend(args.readme_path, args.daily_dir)
         return
     report_date = dt.datetime.now(dt.timezone.utc).date()
     daily_path = f"{args.daily_dir}/{report_date.isoformat()}.md"
@@ -1337,6 +1500,8 @@ def main() -> None:
     daily_counts = read_daily_tag_counts(args.daily_dir)
     update_readme_tag_chart(args.readme_path, aggregate_tag_counts(daily_counts))
     update_readme_tag_trend(args.readme_path, args.daily_dir)
+    update_readme_category_summary(args.readme_path, args.daily_dir)
+    update_readme_weekly_trend(args.readme_path, args.daily_dir)
     if args.backfill_days > 0:
         for offset in range(args.backfill_days):
             day = report_date - dt.timedelta(days=offset)
