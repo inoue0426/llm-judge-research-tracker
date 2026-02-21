@@ -971,6 +971,9 @@ def parse_daily_papers(markdown: str) -> List[Dict[str, str]]:
         if stripped.startswith("Published:"):
             current["published"] = stripped.split(":", 1)[1].strip()
             continue
+        if stripped.startswith("Link:"):
+            current["link"] = stripped.split(":", 1)[1].strip()
+            continue
         if stripped.startswith("Abstract:"):
             current["abstract"] = stripped.split(":", 1)[1].strip()
             continue
@@ -1065,7 +1068,7 @@ def read_daily_papers(daily_dir: str) -> List[Dict[str, str]]:
 
 
 def render_category_summary(papers: List[Dict[str, str]]) -> str:
-    """Render representative titles per subclass.
+    """Render representative titles per subclass as title/link bullets.
 
     Args:
         papers: Parsed papers.
@@ -1077,6 +1080,7 @@ def render_category_summary(papers: List[Dict[str, str]]) -> str:
     for paper in papers:
         title = paper.get("title", "Untitled")
         published = paper.get("published", "")
+        link = paper.get("link", "")
         tags_raw = paper.get("tags", "")
         tags = [tag.strip() for tag in tags_raw.split(",") if tag.strip()]
         if not tags:
@@ -1088,9 +1092,10 @@ def render_category_summary(papers: List[Dict[str, str]]) -> str:
             tags = labels
         for tag in tags:
             by_tag.setdefault(tag, []).append(
-                {"title": title, "published": published}
+                {"title": title, "published": published, "link": link}
             )
     lines: List[str] = []
+    seen: set[tuple[str, str]] = set()
     for tag in sorted(by_tag.keys()):
         entries = sorted(
             by_tag[tag],
@@ -1098,8 +1103,17 @@ def render_category_summary(papers: List[Dict[str, str]]) -> str:
             reverse=True,
         )
         picked = entries[:3]
-        titles = "; ".join(item["title"] for item in picked)
-        lines.append(f"- {tag}: {titles}")
+        def format_item(item: Dict[str, str]) -> str:
+            if item.get("link"):
+                return f'[{item["title"]}]({item["link"]})'
+            return item["title"]
+
+        for item in picked:
+            key = (item.get("title", ""), item.get("link", ""))
+            if key in seen:
+                continue
+            seen.add(key)
+            lines.append(f"- {format_item(item)}")
     return "\n".join(lines)
 
 
