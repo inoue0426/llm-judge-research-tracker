@@ -968,6 +968,9 @@ def parse_daily_papers(markdown: str) -> List[Dict[str, str]]:
             continue
         if not current:
             continue
+        if stripped.startswith("Authors:"):
+            current["authors"] = stripped.split(":", 1)[1].strip()
+            continue
         if stripped.startswith("Published:"):
             current["published"] = stripped.split(":", 1)[1].strip()
             continue
