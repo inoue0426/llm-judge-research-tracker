@@ -555,7 +555,44 @@ def summarize_results(
             tags=tags,
         )
         summaries.append(summary)
-    return summaries
+    return dedupe_summaries(summaries)
+
+
+def normalize_arxiv_id(arxiv_id: str) -> str:
+    """Normalize arXiv IDs by stripping version suffixes.
+
+    Args:
+        arxiv_id: Raw arXiv identifier.
+
+    Returns:
+        Normalized arXiv ID without version suffix.
+    """
+    return re.sub(r"v\\d+$", "", arxiv_id.strip())
+
+
+def dedupe_summaries(summaries: Sequence[PaperSummary]) -> List[PaperSummary]:
+    """Remove duplicate papers, keeping the most recently updated version.
+
+    Args:
+        summaries: Summaries to deduplicate.
+
+    Returns:
+        Deduplicated summaries.
+    """
+    unique: Dict[str, PaperSummary] = {}
+    for summary in summaries:
+        key = normalize_arxiv_id(summary.arxiv_id)
+        existing = unique.get(key)
+        if existing is None:
+            unique[key] = summary
+            continue
+        if summary.updated > existing.updated:
+            unique[key] = summary
+            continue
+        if summary.updated == existing.updated and summary.published > existing.published:
+            unique[key] = summary
+            continue
+    return list(unique.values())
 
 
 def render_markdown(
