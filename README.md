@@ -18,14 +18,17 @@ Automation:
 
 <!-- TAG_STATS_START -->
 ```mermaid
-pie title LLM-as-a-Judge Subclass Counts (Total 101)
-    "Judge Reliability And Calibration (33)" : 33
-    "Benchmark And Dataset Creation (30)" : 30
-    "Metrics And Scoring Methods (15)" : 15
-    "Judge Prompting Protocols (12)" : 12
-    "Robustness And Sensitivity (6)" : 6
-    "Domain-Specific Judging (5)" : 5
+pie title LLM-as-a-Judge Subclass Counts (Total 205)
+    "Judge Reliability And Calibration (61)" : 61
+    "Benchmark And Dataset Creation (60)" : 60
+    "Metrics And Scoring Methods (28)" : 28
+    "Judge Prompting Protocols (27)" : 27
+    "Robustness And Sensitivity (16)" : 16
+    "Domain-Specific Judging (11)" : 11
+    "Multi-Judge Or Ensemble Methods (1)" : 1
+    "Unclassified (1)" : 1
 ```
+Legend (Series Order): 1. Judge Reliability And Calibration (61) | 2. Benchmark And Dataset Creation (60) | 3. Metrics And Scoring Methods (28) | 4. Judge Prompting Protocols (27) | 5. Robustness And Sensitivity (16) | 6. Domain-Specific Judging (11) | 7. Multi-Judge Or Ensemble Methods (1) | 8. Unclassified (1)
 <!-- TAG_STATS_END -->
 
 ## Subclass Summaries
@@ -41,24 +44,30 @@ pie title LLM-as-a-Judge Subclass Counts (Total 101)
 ### Representative Papers (Auto)
 
 <!-- CATEGORY_SUMMARY_START -->
-- Benchmark And Dataset Creation: Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models; Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models; The Emergence of Lab-Driven Alignment Signatures: A Psychometric Framework for Auditing Latent Bias and Compounding Risk in Generative AI
-- Domain-Specific Judging: LiveClin: A Live Clinical Benchmark without Leakage; LiveClin: A Live Clinical Benchmark without Leakage; Assessing Large Language Models for Medical QA: Zero-Shot and LLM-as-a-Judge Evaluation
-- Judge Prompting Protocols: When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment; When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment; Multi-Objective Alignment of Language Models for Personalized Psychotherapy
-- Judge Reliability And Calibration: On the Reliability of User-Centric Evaluation of Conversational Recommender Systems; Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study; When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment
-- Metrics And Scoring Methods: Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation; Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study; Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation
-- Robustness And Sensitivity: Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models; Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation; Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models
+- [Preserving Historical Truth: Detecting Historical Revisionism in Large Language Models]([arXiv](http://arxiv.org/abs/2602.17433v1))
+- [The Emergence of Lab-Driven Alignment Signatures: A Psychometric Framework for Auditing Latent Bias and Compounding Risk in Generative AI]([arXiv](http://arxiv.org/abs/2602.17127v1))
+- [LiveClin: A Live Clinical Benchmark without Leakage]([arXiv](http://arxiv.org/abs/2602.16747v1))
+- [Assessing Large Language Models for Medical QA: Zero-Shot and LLM-as-a-Judge Evaluation]([arXiv](http://arxiv.org/abs/2602.14564v1))
+- [When LLM Judges Inflate Scores: Exploring Overrating in Relevance Assessment]([arXiv](http://arxiv.org/abs/2602.17170v1))
+- [Multi-Objective Alignment of Language Models for Personalized Psychotherapy]([arXiv](http://arxiv.org/abs/2602.16053v1))
+- [On the Reliability of User-Centric Evaluation of Conversational Recommender Systems]([arXiv](http://arxiv.org/abs/2602.17264v1))
+- [Quantifying and Mitigating Socially Desirable Responding in LLMs: A Desirability-Matched Graded Forced-Choice Psychometric Study]([arXiv](http://arxiv.org/abs/2602.17262v1))
+- [Same Meaning, Different Scores: Lexical and Syntactic Sensitivity in LLM Evaluation]([arXiv](http://arxiv.org/abs/2602.17316v1))
+- [MILE-RefHumEval: A Reference-Free, Multi-Independent LLM Framework for Human-Aligned Evaluation]([arXiv](http://arxiv.org/abs/2602.09624v1))
+- [CodeCircuit: Toward Inferring LLM-Generated Code Correctness via Attribution Graphs]([arXiv](http://arxiv.org/abs/2602.07080v1))
 <!-- CATEGORY_SUMMARY_END -->
 
 ### Weekly Trend Summary (Auto)
 
 <!-- WEEKLY_TREND_START -->
 - Week ending 2026-02-20 (UTC).
-- Benchmark And Dataset Creation: 22 (+14 vs prior week)
-- Domain-Specific Judging: 4 (+3 vs prior week)
-- Judge Prompting Protocols: 9 (+6 vs prior week)
-- Judge Reliability And Calibration: 26 (+19 vs prior week)
-- Metrics And Scoring Methods: 11 (+7 vs prior week)
-- Robustness And Sensitivity: 4 (+2 vs prior week)
+- Benchmark And Dataset Creation: 22 (+4 vs prior week)
+- Domain-Specific Judging: 4 (+0 vs prior week)
+- Judge Prompting Protocols: 9 (+0 vs prior week)
+- Judge Reliability And Calibration: 26 (+9 vs prior week)
+- Metrics And Scoring Methods: 11 (+4 vs prior week)
+- Multi-Judge Or Ensemble Methods: 0 (-1 vs prior week)
+- Robustness And Sensitivity: 4 (-3 vs prior week)
 <!-- WEEKLY_TREND_END -->
 
 ## Subclass Cumulative Trend (Monthly)
